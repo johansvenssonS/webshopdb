@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "expess": "^0.0.1-security",
+    "express": "^5.2.1",
+    "mysql2": "^3.17.1"
+  }
+}
