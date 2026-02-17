@@ -12,14 +12,24 @@ const db = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
+db.getConnection((err, connection) => {
+  if (err) {
+    console.error("Databaskoppling MISSLYCKADES:", err.message);
+    process.exit(1);
+  } else {
+    console.log("✓ Databaskoppling LYCKADES!");
+    connection.release();
+  }
+});
+
 app.listen(3000, () => console.log("Servern Körs"));
 
 app.get("/products", async (req, res) => {
   try {
-    const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
-    console.log("Connected DB:", dbNameRows[0]?.db);
-    const [tables] = await db.promise().query("SHOW TABLES");
-    console.log("SHOW TABLES:", tables);
+    // const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
+    // console.log("Connected DB:", dbNameRows[0]?.db);
+    // const [tables] = await db.promise().query("SHOW TABLES");
+    // console.log("SHOW TABLES:", tables);
     const [rows] = await db.promise().query("SELECT * FROM products");
     res.json(rows);
   } catch (error) {
@@ -27,17 +37,29 @@ app.get("/products", async (req, res) => {
     res.status(500).json({ error: "Databas fel/error" });
   }
 });
-
-//Behövde göra inserts, kunde inte hitta mysql workbench. http://localhost:3000/products
-// CREATE TABLE products (
-//   id_product INT PRIMARY KEY AUTO_INCREMENT,
-//   name VARCHAR(255) NOT NULL,
-//   price DECIMAL(10, 2) NOT NULL,
-//   stock INT NOT NULL
-// );
-
-// INSERT INTO products (name, price, stock) VALUES
-// ('Smartphone X', 8999, 50),
-// ('Laptop Pro', 15500, 15),
-// ('Bluetooth Headphones', 1200, 100),
-// ('USB-C Hub', 450, 200);
+app.get("/customer", async (req, res) => {
+  try {
+    // const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
+    // console.log("Connected DB:", dbNameRows[0]?.db);
+    // const [tables] = await db.promise().query("SHOW TABLES");
+    // console.log("SHOW TABLES:", tables);
+    const [rows] = await db.promise().query("SELECT * FROM customer");
+    res.json(rows);
+  } catch (error) {
+    console.error("Error vid hämtning av kunder:", error);
+    res.status(500).json({ error: "Databas fel/error" });
+  }
+});
+app.get("/order", async (req, res) => {
+  try {
+    // const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
+    // console.log("Connected DB:", dbNameRows[0]?.db);
+    // const [tables] = await db.promise().query("SHOW TABLES");
+    // console.log("SHOW TABLES:", tables);
+    const [rows] = await db.promise().query("SELECT * FROM `order`");
+    res.json(rows);
+  } catch (error) {
+    console.error("Error vid hämtning av ordrar:", error);
+    res.status(500).json({ error: "Databas fel/error" });
+  }
+});
