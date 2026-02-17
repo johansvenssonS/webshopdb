@@ -29,16 +29,16 @@ CREATE
  */
 
 app.post("/products", async (req, res) => {
-    const { name, price, stock, id_category } = req.body;
+    const { name, price, stock } = req.body;
 
-    if (!name || price == null || stock == null || !id_category) {
+    if (!name || price == null || stock == null) {
         return res.status(400).json({ error: "Missing required fields" });
     }
     try {
         const [result] = await db.promise().query(
-            `INSERT INTO products (name, price, stock, id_category)
-      VALUES (?, ?, ?, ?)`,
-            [name, price, stock, id_category],
+            `INSERT INTO products (name, price, stock)
+      VALUES (?, ?, ?)`,
+            [name, price, stock],
         );
 
         res.status(201).json({ id_product: result.insertId });
