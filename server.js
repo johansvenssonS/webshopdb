@@ -25,43 +25,28 @@ db.getConnection((err, connection) => {
 app.listen(3000, () => console.log("Servern Körs"));
 
 /* 
-READ 
-*/
+CREATE
+ */
 
-app.get("/products", async (req, res) => {
-    try {
-        // const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
-        // console.log("Connected DB:", dbNameRows[0]?.db);
-        // const [tables] = await db.promise().query("SHOW TABLES");
-        // console.log("SHOW TABLES:", tables);
-        const [rows] = await db.promise().query("SELECT * FROM products");
-        res.json(rows);
-    } catch (error) {
-        console.error("Error vid hämtning av produkter:", error);
-        res.status(500).json({ error: "Databas fel/error" });
-    }
-});
-
-///CREATE
 app.post("/products", async (req, res) => {
-  try {
-    const { name, price, stock } = req.body;
-    const [result] = await db
-      .promise()
-      .query("INSERT INTO products (name, price, stock) VALUES (?,?,?)", [
-        name,
-        price,
-        stock,
-      ]);
-    res.status(201).json({
-      id: result.insertId,
-      name,
-      price,
-      stock,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Kunde inte lägga till produkt" });
-  }
+    try {
+        const { name, price, stock } = req.body;
+        const [result] = await db
+            .promise()
+            .query("INSERT INTO products (name, price, stock) VALUES (?,?,?)", [
+                name,
+                price,
+                stock,
+            ]);
+        res.status(201).json({
+            id: result.insertId,
+            name,
+            price,
+            stock,
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Kunde inte lägga till produkt" });
+    }
 });
 
 app.get("/customer", async (req, res) => {
@@ -87,6 +72,24 @@ app.get("/order", async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error("Error vid hämtning av ordrar:", error);
+        res.status(500).json({ error: "Databas fel/error" });
+    }
+});
+
+/* 
+READ 
+*/
+
+app.get("/products", async (req, res) => {
+    try {
+        // const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
+        // console.log("Connected DB:", dbNameRows[0]?.db);
+        // const [tables] = await db.promise().query("SHOW TABLES");
+        // console.log("SHOW TABLES:", tables);
+        const [rows] = await db.promise().query("SELECT * FROM products");
+        res.json(rows);
+    } catch (error) {
+        console.error("Error vid hämtning av produkter:", error);
         res.status(500).json({ error: "Databas fel/error" });
     }
 });
