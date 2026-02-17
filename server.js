@@ -137,3 +137,24 @@ app.patch("/products/:id", async (req, res) => {
         res.status(500).json({ error: "Update failed" });
     }
 });
+
+/* 
+DELETE
+*/
+app.delete("/products/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [result] = await db
+            .promise()
+            .query("DELETE FROM products WHERE id_product = ?", [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Not found" });
+        }
+
+        res.json({ deletedRows: result.affectedRows });
+    } catch (error) {
+        res.status(500).json({ error: "Delete failed" });
+    }
+});
