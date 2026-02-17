@@ -41,6 +41,29 @@ app.get("/products", async (req, res) => {
         res.status(500).json({ error: "Databas fel/error" });
     }
 });
+
+///CREATE
+app.post("/products", async (req, res) => {
+  try {
+    const { name, price, stock } = req.body;
+    const [result] = await db
+      .promise()
+      .query("INSERT INTO products (name, price, stock) VALUES (?,?,?)", [
+        name,
+        price,
+        stock,
+      ]);
+    res.status(201).json({
+      id: result.insertId,
+      name,
+      price,
+      stock,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Kunde inte lägga till produkt" });
+  }
+});
+
 app.get("/customer", async (req, res) => {
     try {
         // const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
