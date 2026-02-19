@@ -6,20 +6,24 @@ const app = express();
 app.use(express.json());
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 db.getConnection((err, connection) => {
-  if (err) {
-    console.error("Databaskoppling MISSLYCKADES:", err.message);
-    process.exit(1);
-  } else {
-    console.log("✓ Databaskoppling LYCKADES!");
-    connection.release();
-  }
+    if (err) {
+        console.error("Databaskoppling MISSLYCKADES:", err.message);
+        process.exit(1);
+    } else {
+        console.log("✓ Databaskoppling LYCKADES!");
+        connection.release();
+    }
 });
 
 app.listen(3000, () => console.log("Servern Körs"));
@@ -132,45 +136,44 @@ UPDATE
 */
 
 app.patch("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  const { name, price, stock } = req.body;
+    const { id } = req.params;
+    const { name, price, stock } = req.body;
 
-  if (!name && price == null && stock == null) {
-    return res.status(400).json({ error: "Nothing to update" });
-  }
+    if (!name && price == null && stock == null) {
+        return res.status(400).json({ error: "Nothing to update" });
+    }
 
-  const fields = [];
-  const values = [];
+    const fields = [];
+    const values = [];
 
-  if (name) {
-    fields.push("name = ?");
-    values.push(name);
-  }
-  if (price != null) {
-    fields.push("price = ?");
-    values.push(price);
-  }
-  if (stock != null) {
-    fields.push("stock = ?");
-    values.push(stock);
-  }
+    if (name) {
+        fields.push("name = ?");
+        values.push(name);
+    }
+    if (price != null) {
+        fields.push("price = ?");
+        values.push(price);
+    }
+    if (stock != null) {
+        fields.push("stock = ?");
+        values.push(stock);
+    }
 
-  values.push(id);
+    values.push(id);
 
-  try {
-    const [result] = await db
-      .promise()
-      .query(
-        `UPDATE products SET ${fields.join(", ")} WHERE id_product = ?`,
-        values,
-      );
+    try {
+        const [result] = await db
+            .promise()
+            .query(
+                `UPDATE products SET ${fields.join(", ")} WHERE id_product = ?`,
+                values,
+            );
 
-    res.json({ updatedRows: result.affectedRows });
-  } catch (error) {
-    res.status(500).json({ error: "Update failed" });
-  }
+        res.json({ updatedRows: result.affectedRows });
+    } catch (error) {
+        res.status(500).json({ error: "Update failed" });
+    }
 });
-
 
 /* 
 DELETE
