@@ -73,6 +73,40 @@ app.post("/products", async (req, res) => {
     } */
 });
 
+app.post("/orders/", async (req, res) => {
+  const { id_customer, total_amount, id_product, order_qty, payment_method } =
+    req.body;
+  try {
+    /// Först skapa ordern i orders tabellen.
+    const [result] = await db
+      .promise()
+      .query(`INSERT INTO orders (id_customer, total_amount) VALUES (?, ?)`, [
+        id_customer,
+        total_amount,
+      ]);
+    /// Använder de id som används i orders tabell till att skapa orderproduct inserts.
+    const id_order = result.insertId;
+    /// Skapa orderproduct insert.
+    await db
+      .promise()
+      .query(
+        `INSERT INTO orderproduct (id_order, id_product, order_qty, payment_method) VALUES (?, ?, ?, ?)`,
+        [id_order, id_product, order_qty, payment_method],
+      );
+    res.status(201).json({ message: "Order skapad", id_order });
+  } catch (error) {
+    res.status(500).json({ error: "Kunde inte skapa order" });
+  }
+  //exempel på request i Postman
+  //   {
+  //   "id_customer": 1,
+  //   "total_amount": 12999,
+  //   "id_product": 1,
+  //   "order_qty": 1,
+  //   "payment_method": "card"
+  // }
+});
+
 /* 
 READ 
 */
@@ -80,40 +114,58 @@ READ
 /* Product Search */
 
 app.get("/products/search", async (req, res) => {
-    const { q } = req.query;
+  const { q } = req.query;
 
-    if (!q) {
-        return res.status(400).json({ error: "Search query is required" });
-    }
+  if (!q) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
 
-    try {
-        const [rows] = await db
-            .promise()
-            .query(
-                "SELECT * FROM products WHERE name LIKE ?" /* AND stock > 0 */,
-                [`%${q}%`],
-            );
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: "Search failed" });
-    }
+  try {
+    const [rows] = await db
+      .promise()
+      .query("SELECT * FROM products WHERE name LIKE ?" /* AND stock > 0 */, [
+        `%${q}%`,
+      ]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Search failed" });
+  }
 });
 
-app.get("/products/:id", async (req, res) => {
-    const { id } = req.params;
+///Hämta alla produkter.
+app.get("/products", async (req, res) => {
+  try {
+    const [rows] = await db.promise().query("SELECT * FROM products");
 
-    try {
-        const [rows] = await db
-            .promise()
-            .query("SELECT * FROM products WHERE id_product = ?", [id]);
+    if (rows.length === 0)
+      return res.status(404).json({ message: "Not found" });
+
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Fetch failed" });
+  }
+});
+
+//Få detaljerad info om enskild produkt,
+//J
+app.get("/products/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.promise().query(
+      `SELECT products.*, productdescription.desc, productdescription.specs, productdescription.image
+       FROM products 
+       JOIN productdescription ON products.id_product = productdescription.id_product
+       WHERE products.id_product = ?`,
+      [id],
+    );
 
         if (rows.length === 0)
             return res.status(404).json({ message: "Not found" });
 
-        res.json(rows[0]);
-    } catch (error) {
-        res.status(500).json({ error: "Fetch failed" });
-    }
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Fetch failed" });
+  }
 });
 
 // Söka efter produkter med kategeri
@@ -160,14 +212,14 @@ app.get("/orders/:id", async (req, res) => {
 /* Get Avaiable Products */
 
 app.get("/products", async (req, res) => {
-    try {
-        const [rows] = await db
-            .promise()
-            .query("SELECT * FROM products WHERE stock > 0");
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: "Databasfel" });
-    }
+  try {
+    const [rows] = await db
+      .promise()
+      .query("SELECT * FROM products WHERE stock > 0");
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Databasfel" });
+  }
 });
 
 /* app.get("/products", async (req, res) => {
