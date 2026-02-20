@@ -7,9 +7,13 @@ app.use(express.json());
 
 const db = mysql.createPool({
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 db.getConnection((err, connection) => {
@@ -69,6 +73,28 @@ app.post("/products", async (req, res) => {
 READ 
 */
 
+/* Product Search */
+
+app.get("/products/search", async (req, res) => {
+    const { q } = req.query;
+
+    if (!q) {
+        return res.status(400).json({ error: "Search query is required" });
+    }
+
+    try {
+        const [rows] = await db
+            .promise()
+            .query(
+                "SELECT * FROM products WHERE name LIKE ?" /* AND stock > 0 */,
+                [`%${q}%`],
+            );
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: "Search failed" });
+    }
+});
+
 app.get("/products/:id", async (req, res) => {
     const { id } = req.params;
 
@@ -83,6 +109,19 @@ app.get("/products/:id", async (req, res) => {
         res.json(rows[0]);
     } catch (error) {
         res.status(500).json({ error: "Fetch failed" });
+    }
+});
+
+/* Get Avaiable Products */
+
+app.get("/products", async (req, res) => {
+    try {
+        const [rows] = await db
+            .promise()
+            .query("SELECT * FROM products WHERE stock > 0");
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: "Databasfel" });
     }
 });
 
