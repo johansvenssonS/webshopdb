@@ -213,6 +213,7 @@ app.patch("/products/:id", async (req, res) => {
 /* 
 DELETE
 */
+
 app.delete("/products/:id", async (req, res) => {
     const { id } = req.params;
 
