@@ -73,6 +73,28 @@ app.post("/products", async (req, res) => {
 READ 
 */
 
+/* Product Search */
+
+app.get("/products/search", async (req, res) => {
+    const { q } = req.query;
+
+    if (!q) {
+        return res.status(400).json({ error: "Search query is required" });
+    }
+
+    try {
+        const [rows] = await db
+            .promise()
+            .query(
+                "SELECT * FROM products WHERE name LIKE ?" /* AND stock > 0 */,
+                [`%${q}%`],
+            );
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: "Search failed" });
+    }
+});
+
 app.get("/products/:id", async (req, res) => {
     const { id } = req.params;
 
