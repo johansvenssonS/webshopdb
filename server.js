@@ -6,24 +6,24 @@ const app = express();
 app.use(express.json());
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 db.getConnection((err, connection) => {
-  if (err) {
-    console.error("Databaskoppling MISSLYCKADES:", err.message);
-    process.exit(1);
-  } else {
-    console.log("✓ Databaskoppling LYCKADES!");
-    connection.release();
-  }
+    if (err) {
+        console.error("Databaskoppling MISSLYCKADES:", err.message);
+        process.exit(1);
+    } else {
+        console.log("✓ Databaskoppling LYCKADES!");
+        connection.release();
+    }
 });
 
 app.listen(3000, () => console.log("Servern Körs"));
@@ -33,23 +33,27 @@ CREATE
  */
 
 app.post("/products", async (req, res) => {
-  const { name, price, stock } = req.body;
+    const { name, price, stock, id_category } = req.body;
 
-  if (!name || price == null || stock == null) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-  try {
-    const [result] = await db.promise().query(
-      `INSERT INTO products (name, price, stock)
-      VALUES (?, ?, ?)`,
-      [name, price, stock],
-    );
+    if (!name || price == null || stock == null || !id_category) {
+        return res.status(400).json({ error: "Missing required fields" });
+    }
+    try {
+        const [result] = await db.promise().query(
+            `INSERT INTO products (name, price, stock, id_category)
+      VALUES (?, ?, ?, ?)`,
+            [name, price, stock, id_category],
+        );
 
-    res.status(201).json({ id_product: result.insertId });
-  } catch (error) {
-    res.status(500).json({ error: "Insert failed" });
-  }
-  /*  try {
+        res.status(201).json({
+            message: "Product created",
+            id_product: result.insertId,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+    /*  try {
         const { name, price, stock } = req.body;
         const [result] = await db
             .promise()
@@ -96,61 +100,61 @@ app.get("/products/search", async (req, res) => {
 });
 
 app.get("/products/:id", async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    const [rows] = await db
-      .promise()
-      .query("SELECT * FROM products WHERE id_product = ?", [id]);
+    try {
+        const [rows] = await db
+            .promise()
+            .query("SELECT * FROM products WHERE id_product = ?", [id]);
 
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Not found" });
+        if (rows.length === 0)
+            return res.status(404).json({ message: "Not found" });
 
-    res.json(rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
-  }
+        res.json(rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: "Fetch failed" });
+    }
 });
 
 // Söka efter produkter med kategeri
 app.get("/category/:id", async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    const [rows] = await db
-      .promise()
-      .query("SELECT * FROM products WHERE id_category = ?", [id]);
+    try {
+        const [rows] = await db
+            .promise()
+            .query("SELECT * FROM products WHERE id_category = ?", [id]);
 
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Not found" });
+        if (rows.length === 0)
+            return res.status(404).json({ message: "Not found" });
 
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
-  }
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: "Fetch failed" });
+    }
 });
 // Söka efter order med ett specfikt id,
 // JOIN ihop relevant info från orders, orderproduct tabeller.
 app.get("/orders/:id", async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    const [rows] = await db.promise().query(
-      `SELECT orders.*, orderproduct.id_product, orderproduct.order_qty,
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT orders.*, orderproduct.id_product, orderproduct.order_qty,
         orderproduct.payment_method, orderproduct.payment_status 
         FROM orders 
         JOIN orderproduct ON orders.id_order = orderproduct.id_order
         WHERE orders.id_order = ?`,
-      [id],
-    );
+            [id],
+        );
 
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Not found" });
+        if (rows.length === 0)
+            return res.status(404).json({ message: "Not found" });
 
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
-  }
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: "Fetch failed" });
+    }
 });
 
 /* Get Avaiable Products */
@@ -212,43 +216,43 @@ UPDATE
 */
 
 app.patch("/products/:id", async (req, res) => {
-  const { id } = req.params;
-  const { name, price, stock } = req.body;
+    const { id } = req.params;
+    const { name, price, stock } = req.body;
 
-  if (!name && price == null && stock == null) {
-    return res.status(400).json({ error: "Nothing to update" });
-  }
+    if (!name && price == null && stock == null) {
+        return res.status(400).json({ error: "Nothing to update" });
+    }
 
-  const fields = [];
-  const values = [];
+    const fields = [];
+    const values = [];
 
-  if (name) {
-    fields.push("name = ?");
-    values.push(name);
-  }
-  if (price != null) {
-    fields.push("price = ?");
-    values.push(price);
-  }
-  if (stock != null) {
-    fields.push("stock = ?");
-    values.push(stock);
-  }
+    if (name) {
+        fields.push("name = ?");
+        values.push(name);
+    }
+    if (price != null) {
+        fields.push("price = ?");
+        values.push(price);
+    }
+    if (stock != null) {
+        fields.push("stock = ?");
+        values.push(stock);
+    }
 
-  values.push(id);
+    values.push(id);
 
-  try {
-    const [result] = await db
-      .promise()
-      .query(
-        `UPDATE products SET ${fields.join(", ")} WHERE id_product = ?`,
-        values,
-      );
+    try {
+        const [result] = await db
+            .promise()
+            .query(
+                `UPDATE products SET ${fields.join(", ")} WHERE id_product = ?`,
+                values,
+            );
 
-    res.json({ updatedRows: result.affectedRows });
-  } catch (error) {
-    res.status(500).json({ error: "Update failed" });
-  }
+        res.json({ updatedRows: result.affectedRows });
+    } catch (error) {
+        res.status(500).json({ error: "Update failed" });
+    }
 });
 
 /* 
@@ -256,19 +260,19 @@ DELETE
 */
 
 app.delete("/products/:id", async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    const [result] = await db
-      .promise()
-      .query("DELETE FROM products WHERE id_product = ?", [id]);
+    try {
+        const [result] = await db
+            .promise()
+            .query("DELETE FROM products WHERE id_product = ?", [id]);
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Not found" });
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Not found" });
+        }
+
+        res.json({ deletedRows: result.affectedRows });
+    } catch (error) {
+        res.status(500).json({ error: "Delete failed" });
     }
-
-    res.json({ deletedRows: result.affectedRows });
-  } catch (error) {
-    res.status(500).json({ error: "Delete failed" });
-  }
 });
