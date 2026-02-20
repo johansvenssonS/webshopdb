@@ -90,6 +90,19 @@ app.get("/products/:id", async (req, res) => {
     }
 });
 
+/* Get Avaiable Products */
+
+app.get("/products", async (req, res) => {
+    try {
+        const [rows] = await db
+            .promise()
+            .query("SELECT * FROM products WHERE stock > 0");
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: "Databasfel" });
+    }
+});
+
 /* app.get("/products", async (req, res) => {
     try {
         // const [dbNameRows] = await db.promise().query("SELECT DATABASE() AS db");
