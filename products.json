@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Brödrost",
+    "price": 299,
+    "stock": 27,
+    "id_category": 3
+  },
+  {
+    "name": "Spis",
+    "price": 3499,
+    "stock": 5,
+    "id_category": 3
+  },
+  {
+    "name": "Mikrovågsugn",
+    "price": 899,
+    "stock": 12,
+    "id_category": 3
+  },
+  {
+    "name": "Kaffebryggare",
+    "price": 549,
+    "stock": 33,
+    "id_category": 3
+  },
+  {
+    "name": "Mixer",
+    "price": 449,
+    "stock": 22,
+    "id_category": 3
+  },
+  {
+    "name": "Kylskåp",
+    "price": 4999,
+    "stock": 9,
+    "id_category": 3
+  },
+  {
+    "name": "Diskmaskin",
+    "price": 5499,
+    "stock": 5,
+    "id_category": 3
+  },
+  {
+    "name": "Skrivbordlampa LED",
+    "price": 349,
+    "stock": 10,
+    "id_category": 1
+  },
+  {
+    "name": "Väckarklocka Digital",
+    "price": 299,
+    "stock": 7,
+    "id_category": 1
+  },
+  {
+    "name": "Elradiator",
+    "price": 899,
+    "stock": 4,
+    "id_category": 1
+  },
+  {
+    "name": "Fläkt",
+    "price": 599,
+    "stock": 6,
+    "id_category": 1
+  },
+  {
+    "name": "Vattenkokare",
+    "price": 449,
+    "stock": 2,
+    "id_category": 1
+  },
+  {
+    "name": "Luftfuktare",
+    "price": 799,
+    "stock": 4,
+    "id_category": 1
+  },
+  {
+    "name": "Smarta Glödlampor",
+    "price": 399,
+    "stock": 3,
+    "id_category": 1
+  },
+  {
+    "name": "TV 55 tum",
+    "price": 5499,
+    "stock": 15,
+    "id_category": 2
+  },
+  {
+    "name": "Hörlurar",
+    "price": 1299,
+    "stock": 12,
+    "id_category": 2
+  }
+]

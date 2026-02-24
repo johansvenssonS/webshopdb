@@ -1,5 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2");
+const fs = require("fs");
+
 require("dotenv").config();
 
 const app = express();
@@ -27,6 +29,23 @@ db.getConnection((err, connection) => {
 });
 
 app.listen(3000, () => console.log("Servern Körs"));
+
+// För att importera data från Json fill till databas,en gång sedan kan denna funktion tas bort eller kommenteras ut.
+// async function importJSON() {
+//   const data = JSON.parse(fs.readFileSync("products.json", "utf8"));
+
+//   for (const p of data) {
+//     await db.execute(
+//       `INSERT INTO products (name, price, stock, id_category)
+//        VALUES (?, ?, ?, ?)`,
+//       [p.name, p.price, p.stock, p.id_category],
+//     );
+//   }
+
+//   console.log("✅ JSON import klar");
+// }
+
+// importJSON();
 
 /* 
 CREATE
