@@ -38,12 +38,33 @@ class Store {
   filterProducts = (filter) => {
     // console.log(this.store);
     //hämta objektet
+    console.log(filter);
     if (filter === "Alla") {
       return this.store;
     }
+    if (filter === "Mobiltelefoner") {
+      filter = 1;
+    } else if (filter === "Laptops") {
+      filter = 2;
+    } else if (filter === "Tv") {
+      filter = 3;
+    } else if (filter === "Surfplattor") {
+      filter = 4;
+    } else if (filter === "Ljud") {
+      filter = 5;
+    } else if (filter === "Hem") {
+      filter = 6;
+    } else if (filter === "Kök") {
+      filter = 7;
+    } else if (filter === "Gaming") {
+      filter = 8;
+    }
     let products = this.store;
+
     /// bygg en array med produkter product.category som är lika med filter
-    const resultArr = products.filter((product) => product.category === filter);
+    const resultArr = products.filter(
+      (product) => product.id_category === filter,
+    );
     return resultArr;
   };
 }
