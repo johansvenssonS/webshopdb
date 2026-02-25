@@ -19,6 +19,7 @@ export const createProductView = (store) => {
   ///Skapa korten
 
   for (let p of store) {
+    console.log(p);
     let div = document.createElement("div");
     div.classList.add("product");
 
@@ -27,6 +28,8 @@ export const createProductView = (store) => {
       <div class="product-text">
         <h4 class="product-name">${p.name}</h4>
         <div class="product-price">Pris:${p.price}</div>
+        <h4> I lager:${p.stock}</h4>
+      </div>
         <button class="modal-product">Läs mer</button>
     `;
 
@@ -51,10 +54,13 @@ export const filterEvents = (store) => {
   }
 };
 
-export const productModalEvents = (btn, p) => {
+export const productModalEvents = async (btn, p) => {
   // Metod för att skapa produkt Modal.
 
-  btn.addEventListener("click", (event) => {
+  btn.addEventListener("click", async (event) => {
+    let data = await getDetailedInfo(p.id_product);
+    let pData = data[0];
+    console.log(data);
     let popUp = document.createElement("div");
     popUp.classList.add("modal");
     popUp.innerHTML = `
@@ -64,7 +70,8 @@ export const productModalEvents = (btn, p) => {
       <div class="modal-text">
         <a class="modal-name">${p.name}</a>
         <div class="modal-price">Pris:${p.price}</div>
-        <p>${p.description}</p>
+        <a class="modal-name">${pData.desc}</a>
+        <a class="modal-name">${pData.specs}</a>
         <button class="btnCart">Lägg till</button>
       </div>
       </div>
@@ -87,4 +94,20 @@ export const productModalEvents = (btn, p) => {
       popUp.remove();
     });
   });
+};
+
+export const getDetailedInfo = async (id_product) => {
+  try {
+    let detailedInfo = await fetch(
+      `http://localhost:3000/products/${id_product}`,
+    );
+    const data = await detailedInfo.json();
+    return data;
+  } catch (error) {
+    console.error("Fel vid hämtning av detaljer:", error);
+    return {
+      desc: "Kunde inte hitta desc",
+      specs: "Kunde inte hitta specifikationer",
+    };
+  }
 };

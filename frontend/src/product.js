@@ -1,11 +1,11 @@
 /// Modul för Product Klassen
 class Product {
-  constructor(name, price, image, description, category) {
+  constructor(name, price, stock, id_product, id_category) {
     this.name = name;
     this.price = price;
-    this.image = image;
-    this.description = description;
-    this.category = category;
+    this.stock = stock;
+    this.id_product = id_product;
+    this.id_category = id_category;
   }
   //Get hjälpmetoder, används inte
   getName = () => {

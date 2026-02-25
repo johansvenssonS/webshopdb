@@ -1,4 +1,5 @@
 import { Product } from "./product.js";
+
 /// Modul för Store Klassen
 class Store {
   constructor() {
@@ -8,6 +9,7 @@ class Store {
   getProducts = async () => {
     const response = await fetch("http://localhost:3000/products");
     const data = await response.json();
+    // console.log(data);
     return data;
   };
   /// Skapa produkt objekt ifrån Json data och lägg till i store arrayen
@@ -16,9 +18,9 @@ class Store {
       let p = new Product(
         item.name,
         item.price,
-        item.image,
-        item.description,
-        item.category,
+        item.stock,
+        item.id_product,
+        item.id_category,
       );
       this.addToStore(p);
     });
