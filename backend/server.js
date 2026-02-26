@@ -109,6 +109,25 @@ app.post("/orders/", async (req, res) => {
     //   "payment_method": "card"
     // }
 });
+app.post("/customer", async (req, res) => {
+  const { name, email, telephone } = req.body;
+  try {
+    /// Först skapa ordern i orders tabellen.
+    const [result] = await db
+      .promise()
+      .query(`INSERT INTO customer (name, email, telephone) VALUES (?, ?, ?)`, [
+        name,
+        email,
+        telephone,
+      ]);
+    /// Använder de id som används i orders tabell till att skapa orderproduct inserts.
+    const id_customer = result.insertId;
+    /// Skapa orderproduct insert.
+    res.status(201).json({ message: "Kund skapad", id_customer });
+  } catch (error) {
+    res.status(500).json({ error: "Kunde inte skapa kund" });
+  }
+});
 
 /* 
 READ 
