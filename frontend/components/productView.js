@@ -39,6 +39,31 @@ export const createProductView = (store) => {
         /// kalla på modalevent här och skicka med btn element och p (produktobjektet)
     }
 };
+/// Event för search
+
+export const searchEvents = (storeInstance) => {
+    const searchInput = document.querySelector("#searchInput");
+    const searchBtn = document.querySelector("#searchBtn");
+
+    if (!searchInput || !searchBtn) return;
+
+    searchBtn.addEventListener("click", async () => {
+        const query = searchInput.value.trim();
+
+        if (!query) return;
+
+        const results = await storeInstance.searchProducts(query);
+        createProductView(results);
+    });
+
+    // Bonus: search on Enter
+    searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            searchBtn.click();
+        }
+    });
+};
+
 /// Event för kategori eventsen
 export const filterEvents = (store) => {
     let buttons = document.querySelectorAll(".menuButton");

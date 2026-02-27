@@ -3,6 +3,7 @@ import { Store } from "./frontend/src/store.js";
 import {
     createProductView,
     filterEvents,
+    searchEvents,
 } from "./frontend/components/productView.js";
 import { Basket } from "./frontend/src/basket.js";
 import { basketHandler } from "./frontend/components/cartView.js";
@@ -28,40 +29,10 @@ console.log(store);
 ///Filtrera store, returnerar en kopia på matchande objekt i store arr[]
 filterEvents(store);
 
+//Search
+searchEvents(store);
+
 /// Metod för att komma åt cart objektet i andra moduler.
 export function getCart() {
     return cart;
 }
-const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
-const productGrid = document.getElementsByClassName("productGrid");
-
-searchBtn.addEventListener("click", async () => {
-    const query = searchInput.value.trim();
-
-    if (!query) {
-        console.log("<li>Skriv något att söka efter</li>");
-        return;
-    }
-
-    try {
-        const response = await fetch(
-            `http://localhost:3000/products/search?q=${query}`,
-        );
-
-        const products = await response.json();
-
-        console.log("");
-
-        if (products.length === 0) {
-            console.log("<li>Inga produkter hittades</li>");
-            return;
-        }
-
-        products.forEach((product) => {
-            console.log(`${product.name} – ${product.price} kr`);
-        });
-    } catch (error) {
-        console.log("<li>Något gick fel</li>");
-    }
-});
