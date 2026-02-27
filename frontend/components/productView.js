@@ -112,6 +112,7 @@ export const productModalEvents = async (btn, p) => {
             cart.addToBasket(p);
             updateCartBadge(cart);
             p.addQuantity();
+            popUp.remove();
         });
 
         // X knapp i modal, stänger ner/tar bort popup.
