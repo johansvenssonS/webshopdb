@@ -33,7 +33,14 @@ class Store {
     getStore = () => {
         return this.store;
     };
-
+    // Sök produkt
+    searchProducts = async (query) => {
+        const response = await fetch(
+            `http://localhost:3000/products/search?q=${query}`,
+        );
+        const data = await response.json();
+        return data;
+    };
     ///filtrera
     filterProducts = (filter) => {
         // console.log(this.store);

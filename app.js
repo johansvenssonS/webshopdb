@@ -1,8 +1,9 @@
 //// hej hej hej
 import { Store } from "./frontend/src/store.js";
 import {
-  createProductView,
-  filterEvents,
+    createProductView,
+    filterEvents,
+    searchEvents,
 } from "./frontend/components/productView.js";
 import { Basket } from "./frontend/src/basket.js";
 import { basketHandler } from "./frontend/components/cartView.js";
@@ -28,7 +29,10 @@ console.log(store);
 ///Filtrera store, returnerar en kopia på matchande objekt i store arr[]
 filterEvents(store);
 
+//Search
+searchEvents(store);
+
 /// Metod för att komma åt cart objektet i andra moduler.
 export function getCart() {
-  return cart;
+    return cart;
 }
