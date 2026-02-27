@@ -77,37 +77,39 @@ app.post("/products", async (req, res) => {
 });
 
 app.post("/orders/", async (req, res) => {
-    const { id_customer, total_amount, id_product, order_qty, payment_method } =
-        req.body;
-    try {
-        /// Först skapa ordern i orders tabellen.
-        const [result] = await db
-            .promise()
-            .query(
-                `INSERT INTO orders (id_customer, total_amount) VALUES (?, ?)`,
-                [id_customer, total_amount],
-            );
-        /// Använder de id som används i orders tabell till att skapa orderproduct inserts.
-        const id_order = result.insertId;
-        /// Skapa orderproduct insert.
-        await db
-            .promise()
-            .query(
-                `INSERT INTO orderproduct (id_order, id_product, order_qty, payment_method) VALUES (?, ?, ?, ?)`,
-                [id_order, id_product, order_qty, payment_method],
-            );
-        res.status(201).json({ message: "Order skapad", id_order });
-    } catch (error) {
-        res.status(500).json({ error: "Kunde inte skapa order" });
-    }
-    //exempel på request i Postman
-    //   {
-    //   "id_customer": 1,
-    //   "total_amount": 12999,
-    //   "id_product": 1,
-    //   "order_qty": 1,
-    //   "payment_method": "card"
-    // }
+  const { id_customer, total_amount, payment_method, products } = req.body;
+  try {
+    /// Först skapa ordern i orders tabellen.
+    const [result] = await db
+      .promise()
+      .query(`INSERT INTO orders (id_customer, total_amount) VALUES (?, ?)`, [
+        id_customer,
+        total_amount,
+      ]);
+    /// Använder de id som används i orders tabell till att skapa orderproduct inserts.
+    const id_order = result.insertId;
+    // Om kund beställer mer än en produkt
+    for (const product of products)
+      /// Skapa orderproduct insert.
+      await db
+        .promise()
+        .query(
+          `INSERT INTO orderproduct (id_order, id_product, order_qty, payment_method) VALUES (?, ?, ?, ?)`,
+          [id_order, product.id_product, product.quantity, payment_method],
+        );
+    res.status(201).json({ message: "Order skapad", id_order });
+  } catch (error) {
+    console.error("order error", error);
+    res.status(500).json({ error: "Kunde inte skapa order" });
+  }
+  //exempel på request i Postman
+  //   {
+  //   "id_customer": 1,
+  //   "total_amount": 12999,
+  //   "id_product": 1,
+  //   "order_qty": 1,
+  //   "payment_method": "card"
+  // }
 });
 app.post("/customer", async (req, res) => {
   const { name, email, telephone } = req.body;
