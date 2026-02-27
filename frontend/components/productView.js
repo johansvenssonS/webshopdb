@@ -56,7 +56,7 @@ export const searchEvents = (storeInstance) => {
         createProductView(results);
     });
 
-    // Bonus: search on Enter
+    // Search on Enter
     searchInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
             searchBtn.click();
