@@ -153,9 +153,26 @@ export const createOrder = (id) => {
         } else {
           //lyckad ta bort knapp så inga fler görs!
           checkoutBtn.remove();
+          let id_order = data.id_order;
+          showOrder(id_order);
           alert("Order skapad!");
         }
       });
   });
 };
-//  27694kr
+
+//metod för att visa upp ordern efter slutfört köp
+export const showOrder = async (id_order) => {
+  const response = await fetch(`http://localhost:3000/orders/${id_order}`);
+  const data = await response.json();
+  let tot_price = document.querySelector(".cart-cost");
+  tot_price.remove();
+  let korg_title = document.querySelector(".korg-title");
+  korg_title.textContent = "Dina Ordrar";
+
+  let korg_item = document.querySelector(".korg-list");
+  korg_item.innerHTML = "";
+  for (const order of data) {
+    korg_item.innerHTML += `ProduktID: ${order.id_product} Antal:${order.order_qty} Beställd: ${order.order_date} Status: ${order.status}<br><br>`;
+  }
+};
