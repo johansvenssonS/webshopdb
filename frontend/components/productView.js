@@ -28,7 +28,7 @@ export const createProductView = (store) => {
       <div class="product-text">
         <h4 class="product-name">${p.name}</h4>
         <div class="product-price">Pris:${p.price}</div>
-        <h4> I lager:${p.stock}</h4>
+        <h4> I lager: ${p.stock}</h4>
       </div>
         <button class="modal-product">Läs mer</button>
     `;
