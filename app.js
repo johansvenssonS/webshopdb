@@ -1,10 +1,11 @@
 //// hej hej hej
 import { Store } from "./frontend/src/store.js";
 import {
-    createProductView,
-    filterEvents,
-    searchEvents,
+  createProductView,
+  filterEvents,
+  searchEvents,
 } from "./frontend/components/productView.js";
+import { orderHistory } from "./frontend/components/orderhistory.js";
 import { Basket } from "./frontend/src/basket.js";
 import { basketHandler } from "./frontend/components/cartView.js";
 ///VID UPPSTART HÄMTA ALLA PRODUKTER
@@ -31,8 +32,9 @@ filterEvents(store);
 
 //Search
 searchEvents(store);
+orderHistory();
 
 /// Metod för att komma åt cart objektet i andra moduler.
 export function getCart() {
-    return cart;
+  return cart;
 }
