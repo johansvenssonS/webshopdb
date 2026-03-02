@@ -27,6 +27,10 @@ class Basket {
             product.quantity = qty;
         }
     }
+    //Clear Basket
+    clearBasket() {
+        this.cart = [];
+    }
     ///Metod för att ta bort specifik vara ifrån kundvagn.
     removeItem(name) {
         const product = this.cart.find((p) => p.name === name);
