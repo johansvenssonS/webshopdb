@@ -100,7 +100,8 @@ header {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 16px;
 }
-.clear {
+.clear,
+.clear-c {
   /* flex-grow: 1; */
   position: relative;
   background: #f63737;

@@ -156,6 +156,7 @@ export const createOrder = (id) => {
           let id_order = data.id_order;
           showOrder(id_order);
           alert("Order skapad!");
+          console.log(cartOfproducts);
         }
       });
   });
