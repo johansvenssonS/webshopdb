@@ -200,6 +200,37 @@ app.get("/category/:id", async (req, res) => {
         res.status(500).json({ error: "Fetch failed" });
     }
 });
+// Söka efter specifik kund, se deras orderhistorik
+app.get("/customer/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.promise().query(
+      `SELECT 
+        customer.name AS customer_name,
+        orders.id_order,
+        orders.order_date,
+        orders.status,
+        orders.total_amount,
+        products.name AS product_name,
+        orderproduct.order_qty
+      FROM orders
+      JOIN orderproduct ON orders.id_order = orderproduct.id_order
+      JOIN products ON orderproduct.id_product = products.id_product
+      JOIN customer ON orders.id_customer = customer.id_customer
+      WHERE orders.id_customer = ?`,
+      [id],
+    );
+
+    if (rows.length === 0)
+      return res.status(404).json({ message: "Not found" });
+
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Fetch failed" });
+  }
+});
+
 // Söka efter order med ett specfikt id,
 // JOIN ihop relevant info från orders, orderproduct tabeller.
 app.get("/orders/:id", async (req, res) => {
