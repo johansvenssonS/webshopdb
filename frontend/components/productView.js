@@ -108,6 +108,10 @@ export const productModalEvents = async (btn, p) => {
         // Eventhantering för köpknapp i popUp
         let buyBtn = popUp.querySelector(".btnCart");
         buyBtn.addEventListener("click", (event) => {
+            if (p.stock <= 0) {
+                alert("This product is not in stock.");
+                return;
+            }
             let cart = getCart();
             cart.addToBasket(p);
             updateCartBadge(cart);
