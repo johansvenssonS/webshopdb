@@ -1,5 +1,7 @@
 import { getCart } from "../../app.js";
 import { updateCartBadge } from "./cartView.js";
+import { Store } from "../src/store.js";
+import { createProductView } from "../components/productView.js";
 
 export const createCheckoutView = (cart) => {
     console.log(cart);
@@ -148,10 +150,27 @@ export const createOrder = (id) => {
             }),
         })
             .then((response) => response.json())
-            .then((data) => {
+            .then(async (data) => {
                 if (data.error) {
                     alert(data.error, "Fel,kunde inte skapa order!");
                 } else {
+                    for (const p of cartOfproducts) {
+                        let newStock = p.stock - p.quantity;
+                        fetch(
+                            `http://localhost:3000/products/${p.id_product}`,
+                            {
+                                method: "PATCH",
+                                headers: {
+                                    "Content-type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    name: p.name,
+                                    price: p.price,
+                                    stock: newStock,
+                                }),
+                            },
+                        );
+                    }
                     //lyckad ta bort knapp så inga fler görs!
                     checkoutBtn.remove();
                     let id_order = data.id_order;
@@ -159,6 +178,11 @@ export const createOrder = (id) => {
                     alert("Order skapad!");
                     cart.clearBasket();
                     updateCartBadge(cart);
+                    let store = new Store();
+                    let productData = await store.getProducts();
+                    store.createProducts(productData);
+                    let productsSortiment = store.getStore();
+                    createProductView(productsSortiment);
                 }
             });
     });

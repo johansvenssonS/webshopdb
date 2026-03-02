@@ -28,7 +28,7 @@ export const createProductView = (store) => {
       <div class="product-text">
         <h4 class="product-name">${p.name}</h4>
         <div class="product-price">Pris:${p.price}</div>
-        <h4> I lager:${p.stock}</h4>
+        <h4> I lager: ${p.stock}</h4>
       </div>
         <button class="modal-product">Läs mer</button>
     `;
@@ -108,6 +108,10 @@ export const productModalEvents = async (btn, p) => {
         // Eventhantering för köpknapp i popUp
         let buyBtn = popUp.querySelector(".btnCart");
         buyBtn.addEventListener("click", (event) => {
+            if (p.stock <= 0) {
+                alert("This product is not in stock.");
+                return;
+            }
             let cart = getCart();
             cart.addToBasket(p);
             updateCartBadge(cart);
