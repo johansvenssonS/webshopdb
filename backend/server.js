@@ -1,8 +1,12 @@
 const express = require("express");
 const mysql = require("mysql2");
+const cors = require("cors");
+const fs = require("fs");
+
 require("dotenv").config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 const db = mysql.createPool({
@@ -27,6 +31,23 @@ db.getConnection((err, connection) => {
 });
 
 app.listen(3000, () => console.log("Servern Körs"));
+
+// För att importera data från Json fill till databas,en gång sedan kan denna funktion tas bort eller kommenteras ut.
+// async function importJSON() {
+//   const data = JSON.parse(fs.readFileSync("products.json", "utf8"));
+
+//   for (const p of data) {
+//     await db.execute(
+//       `INSERT INTO products (name, price, stock, id_category)
+//        VALUES (?, ?, ?, ?)`,
+//       [p.name, p.price, p.stock, p.id_category],
+//     );
+//   }
+
+//   console.log("✅ JSON import klar");
+// }
+
+// importJSON();
 
 /* 
 CREATE
@@ -56,8 +77,7 @@ app.post("/products", async (req, res) => {
 });
 
 app.post("/orders/", async (req, res) => {
-    const { id_customer, total_amount, id_product, order_qty, payment_method } =
-        req.body;
+    const { id_customer, total_amount, payment_method, products } = req.body;
     try {
         /// Först skapa ordern i orders tabellen.
         const [result] = await db
@@ -68,15 +88,23 @@ app.post("/orders/", async (req, res) => {
             );
         /// Använder de id som används i orders tabell till att skapa orderproduct inserts.
         const id_order = result.insertId;
-        /// Skapa orderproduct insert.
-        await db
-            .promise()
-            .query(
-                `INSERT INTO orderproduct (id_order, id_product, order_qty, payment_method) VALUES (?, ?, ?, ?)`,
-                [id_order, id_product, order_qty, payment_method],
-            );
+        // Om kund beställer mer än en produkt
+        for (const product of products)
+            /// Skapa orderproduct insert.
+            await db
+                .promise()
+                .query(
+                    `INSERT INTO orderproduct (id_order, id_product, order_qty, payment_method) VALUES (?, ?, ?, ?)`,
+                    [
+                        id_order,
+                        product.id_product,
+                        product.quantity,
+                        payment_method,
+                    ],
+                );
         res.status(201).json({ message: "Order skapad", id_order });
     } catch (error) {
+        console.error("order error", error);
         res.status(500).json({ error: "Kunde inte skapa order" });
     }
     //exempel på request i Postman
@@ -87,6 +115,24 @@ app.post("/orders/", async (req, res) => {
     //   "order_qty": 1,
     //   "payment_method": "card"
     // }
+});
+app.post("/customer", async (req, res) => {
+    const { name, email, telephone } = req.body;
+    try {
+        /// Först skapa ordern i orders tabellen.
+        const [result] = await db
+            .promise()
+            .query(
+                `INSERT INTO customer (name, email, telephone) VALUES (?, ?, ?)`,
+                [name, email, telephone],
+            );
+        /// Använder de id som används i orders tabell till att skapa orderproduct inserts.
+        const id_customer = result.insertId;
+        /// Skapa orderproduct insert.
+        res.status(201).json({ message: "Kund skapad", id_customer });
+    } catch (error) {
+        res.status(500).json({ error: "Kunde inte skapa kund" });
+    }
 });
 
 /* 
@@ -112,20 +158,6 @@ app.get("/products/search", async (req, res) => {
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: "Search failed" });
-    }
-});
-
-///Hämta alla produkter.
-app.get("/products", async (req, res) => {
-    try {
-        const [rows] = await db.promise().query("SELECT * FROM products");
-
-        if (rows.length === 0)
-            return res.status(404).json({ message: "Not found" });
-
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: "Fetch failed" });
     }
 });
 
@@ -168,6 +200,37 @@ app.get("/category/:id", async (req, res) => {
         res.status(500).json({ error: "Fetch failed" });
     }
 });
+// Söka efter specifik kund, se deras orderhistorik
+app.get("/customer/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db.promise().query(
+      `SELECT 
+        customer.name AS customer_name,
+        orders.id_order,
+        orders.order_date,
+        orders.status,
+        orders.total_amount,
+        products.name AS product_name,
+        orderproduct.order_qty
+      FROM orders
+      JOIN orderproduct ON orders.id_order = orderproduct.id_order
+      JOIN products ON orderproduct.id_product = products.id_product
+      JOIN customer ON orders.id_customer = customer.id_customer
+      WHERE orders.id_customer = ?`,
+      [id],
+    );
+
+    if (rows.length === 0)
+      return res.status(404).json({ message: "Not found" });
+
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: "Fetch failed" });
+  }
+});
+
 // Söka efter order med ett specfikt id,
 // JOIN ihop relevant info från orders, orderproduct tabeller.
 app.get("/orders/:id", async (req, res) => {
@@ -196,9 +259,7 @@ app.get("/orders/:id", async (req, res) => {
 
 app.get("/products", async (req, res) => {
     try {
-        const [rows] = await db
-            .promise()
-            .query("SELECT * FROM products WHERE stock > 0");
+        const [rows] = await db.promise().query("SELECT * FROM products");
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: "Databasfel" });
@@ -240,6 +301,46 @@ app.patch("/products/:id", async (req, res) => {
             .promise()
             .query(
                 `UPDATE products SET ${fields.join(", ")} WHERE id_product = ?`,
+                values,
+            );
+
+        res.json({ updatedRows: result.affectedRows });
+    } catch (error) {
+        res.status(500).json({ error: "Update failed" });
+    }
+});
+// Uppdatera produktbeskrivning
+app.patch("/products/:id/desc", async (req, res) => {
+    const { id } = req.params;
+    const { desc, specs, image } = req.body;
+
+    if (!desc && !specs && !image) {
+        return res.status(400).json({ error: "Nothing to update" });
+    }
+    //desc är tydligen reserverat keyword i mysql
+    /// måste använda backticks, kanske ändra kolumnnamnet i databasen?
+    const fields = [];
+    const values = [];
+    if (desc) {
+        fields.push("`desc` = ?");
+        values.push(desc);
+    }
+    if (specs) {
+        fields.push("specs = ?");
+        values.push(specs);
+    }
+    if (image) {
+        fields.push("image = ?");
+        values.push(image);
+    }
+
+    values.push(id);
+
+    try {
+        const [result] = await db
+            .promise()
+            .query(
+                `UPDATE productdescription SET ${fields.join(", ")} WHERE id_product = ?`,
                 values,
             );
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div id="topHeader">
+        <div id="logo">TechStore</div>
+        <div class="search">
+          <input type="text" id="searchInput" placeholder="Sök produkt..." />
+          <button id="searchBtn">Sök</button>
+          <button class="orderHistory">OrderHistorik</button>
+        </div>
+        <button class="checkout">
+          Kundvagn
+          <span class="cart-badge">0</span>
+        </button>
+      </div>
+      <div id="categories">
+        <button class="menuButton">Alla</button>
+        <button class="menuButton">Mobiltelefoner</button>
+        <button class="menuButton">Laptops</button>
+        <button class="menuButton">Tv</button>
+        <button class="menuButton">Surfplattor</button>
+        <button class="menuButton">Ljud</button>
+        <button class="menuButton">Hem</button>
+        <button class="menuButton">Kök</button>
+        <button class="menuButton">Gaming</button>
+      </div>
+    </header>
+    <main>
+      <div class="productGrid"></div>
+    </main>
+    <footer><p>&copy 2025 Webbshop- All rights reserved.</p></footer>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
