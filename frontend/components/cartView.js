@@ -89,9 +89,14 @@ export const basketHandler = (cart) => {
         items.forEach((item) => {
             const name = item.querySelector("h3").textContent;
             const qtySpan = item.querySelector(".qty");
+            const product = cart.getBasket().find((p) => p.name === name);
 
             item.querySelector(".qty-plus").addEventListener("click", () => {
-                console.log(item.stock);
+                const currentQty = Number(qtySpan.textContent);
+                if (currentQty >= product.stock) {
+                    alert("No more products in stock.");
+                    return;
+                }
                 let newQty = Number(qtySpan.textContent) + 1;
                 cart.updateQuantity(name, newQty);
                 qtySpan.textContent = newQty;
