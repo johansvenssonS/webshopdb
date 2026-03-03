@@ -1,4 +1,17 @@
-export const orderHistory = () => {
+import { createProductView } from "./productView.js";
+
+export const orderHistory = (sortiment) => {
+  let all_Btn = document.querySelector(".menuButton");
+  let main = document.querySelector("main");
+  all_Btn.addEventListener("click", (event) => {
+    event.preventDefault();
+    main.innerHTML = "";
+    let productGrid = document.createElement("div");
+    productGrid.classList.add("productGrid");
+    main.appendChild(productGrid);
+    createProductView(sortiment);
+  });
+
   let orderBtn = document.querySelector(".orderHistory");
   orderBtn.addEventListener("click", (event) => {
     createOrderSearch();

@@ -25,14 +25,14 @@ let productsSortiment = store.getStore();
 ///___________________________________________________
 /// Skapa produktVyn med store objektet
 let view = createProductView(productsSortiment);
-console.log(store);
+console.log(productsSortiment);
 
 ///Filtrera store, returnerar en kopia på matchande objekt i store arr[]
 filterEvents(store);
 
 //Search
 searchEvents(store);
-orderHistory();
+orderHistory(productsSortiment);
 
 /// Metod för att komma åt cart objektet i andra moduler.
 export function getCart() {
