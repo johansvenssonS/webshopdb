@@ -151,10 +151,7 @@ app.get("/products/search", async (req, res) => {
     try {
         const [rows] = await db
             .promise()
-            .query(
-                "SELECT * FROM products WHERE name LIKE ?" /* AND stock > 0 */,
-                [`%${q}%`],
-            );
+            .query("SELECT * FROM products WHERE name LIKE ?", [`%${q}%`]);
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: "Search failed" });
@@ -202,11 +199,11 @@ app.get("/category/:id", async (req, res) => {
 });
 // Söka efter specifik kund, se deras orderhistorik
 app.get("/customer/:id", async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    const [rows] = await db.promise().query(
-      `SELECT 
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT 
         customer.name AS customer_name,
         orders.id_order,
         orders.order_date,
@@ -219,16 +216,16 @@ app.get("/customer/:id", async (req, res) => {
       JOIN products ON orderproduct.id_product = products.id_product
       JOIN customer ON orders.id_customer = customer.id_customer
       WHERE orders.id_customer = ?`,
-      [id],
-    );
+            [id],
+        );
 
-    if (rows.length === 0)
-      return res.status(404).json({ message: "Not found" });
+        if (rows.length === 0)
+            return res.status(404).json({ message: "Not found" });
 
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: "Fetch failed" });
-  }
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: "Fetch failed" });
+    }
 });
 
 // Söka efter order med ett specfikt id,
