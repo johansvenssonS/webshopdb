@@ -1,72 +1,106 @@
-# webshopdb
+🛒 Fullstack Webshop - Skolprojekt
 
-webshopdb
+Detta är en fullstack-webshop byggd med en tydlig separation mellan frontend och backend. Projektet använder en molnbaserad SQL-databas för att hantera produkter, kunder och ordrar.
 
-//Behövde göra inserts, kunde inte hitta mysql workbench. http://localhost:3000/products
-// CREATE TABLE products (
-// id_product INT PRIMARY KEY AUTO_INCREMENT,
-// name VARCHAR(255) NOT NULL,
-// price DECIMAL(10, 2) NOT NULL,
-// stock INT NOT NULL
-// );
+---
 
-// INSERT INTO products (name, price, stock) VALUES
-// ('Smartphone X', 8999, 50),
-// ('Laptop Pro', 15500, 15),
-// ('Bluetooth Headphones', 1200, 100),
-// ('USB-C Hub', 450, 200);
+## 🛠 Teknikstack
 
-# webshopdb - Databaskoppling Guide
+- **Frontend:** HTML, CSS, JavaScript (Vanilla)
+- **Backend:** Node.js & Express.js
+- **Databas:** SQL (Hostad via [Aiven](https://aiven.io/))
 
-## Problem: "Access denied" när man ansluter från WSL till Windows MySQL
+---
 
-### Lösning
+## 🚀 Kom igång lokalt
 
-**Steg 1: I MySQL Workbench (Windows), skapa remote-användaren**
+Följ dessa steg för att installera och köra projektet på din egen dator.
 
-```sql
-CREATE USER 'webshopdb'@'192.168.0.xxx' IDENTIFIED BY 'webshop_pass';
-GRANT ALL PRIVILEGES ON webshopdb.* TO 'webshopdb'@'192.168.0.xxx';
-FLUSH PRIVILEGES;
+### 1. Installation av dependencies
+
+Du behöver installera paket i projektets root, samt i mapparna för frontend och backend.
+
+````bash
+# I projektets root
+npm install
+
+# Installera för frontend
+cd frontend
+npm install
+cd ..
+
+# Installera för backend
+cd backend
+npm install
+### 2. Konfigurera Databas (.env)
+
+Du måste koppla backenden till din Aiven-databas för att applikationen ska fungera.
+
+1. Navigera till mappen `backend/`.
+2. Skapa en fil med namnet `.env`.
+3. Lägg till din anslutningssträng:
+
+```env
+DATABASE_URL=din_aiven_anslutningssträng_här
+PORT=3000
+````
+
+---
+
+## 2. Konfigurera Databas (.env)
+
+Du måste koppla backenden till din Aiven-databas för att applikationen ska fungera.
+
+1. Navigera till mappen `backend/`.
+2. Skapa en fil med namnet `.env`.
+3. Lägg till din anslutningssträng:
+
+```env
+Så här har vår .env fil sett ut.
+DB_HOST=***
+DB_USER=***
+DB_PASSWORD=***
+DB_NAME=***
+DB_PORT=***
+
+PORT=3000
 ```
 
-**Steg 2: Uppdatera .env i WSL**
+---
 
-```
-DB_HOST=192.168.0.xxx
-DB_USER=webshopdb
-DB_PASSWORD=webshop_pass
-DB_NAME=webshopdb
-PORT=3306
-```
+### 3. Starta applikationen
 
-**Steg 3: Från WSL terminal, testa anslutningen**
+För att köra projektet fullt ut behöver du ha två processer igång samtidigt:
 
-```bash
-mysql -h 192.168.0.XXX -u webshopdb -pwebshop_pass webshopdb
-SHOW TABLES;
-```
-
-**Steg 4: Starta Node.js server**
+- **Backend:** Gå till mappen `backend/` i terminalen och kör:
 
 ```bash
 node server.js
 ```
 
-Testa: `http://localhost:3000/products`
+- **Frontend:** Stå i projektets root och starta din frontend genom att använda tillägget **Live Server** i VS Code (högerklicka på `index.html` inne i mappen `frontend/` och välj _"Open with Live Server"_).
 
-### Vanliga fel
+---
 
-- **ERROR 1045**: Fel lösenord eller användarnamn
-- **ERROR 1044**: Användaren har inte rättigheter till databasen
-- **Connection refused**: Fel IP-adress (använd `ipconfig` i Windows för att hitta rätt IP)
+## ✨ Funktioner
 
-### Windows IP-adress
+- **Produktkatalog:** Hämtar data i realtid från SQL-databasen.
+- **Kategorisering:** Sortera produkter baserat på kategori för enklare navigering.
+- **Sökfunktion:** Hitta produkter snabbt via ett dynamiskt sökfält.
+- **Varukorg:** Lägg till, ändra och hantera produkter inför ett köp.
+- **Användarhantering:** Möjlighet att registrera sig som kund i systemet.
+- **Orderläggning:** Skapa och spara ordrar som kopplas direkt till kundkontot i databasen.
 
-För att hitta din Windows-IP, öppna Command Prompt och kör:
+---
 
-```cmd
-ipconfig
+## 📂 Projektstruktur
+
+```plaintext
+.
+├── backend/            # Express-endpoints och miljövariabler (.env)
+├── frontend/           # Klient-sidan (HTML, CSS, JS)
+├── node_modules/       # Projektets bibliotek/dependencies
+├── package.json        # Root-konfiguration
+├── server.js           # Huvudfil för backend-servern
+└── README.md           # Projektdokumentation
 ```
-
-Leta efter "IPv4 Address" - det är något typ: `192.168.x.x`
